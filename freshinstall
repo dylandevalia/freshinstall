@@ -1,0 +1,251 @@
+#!/bin/bash
+
+check_dialog_cancel() {
+	q=$?
+	if [ "$q" != "0" ] 
+	then
+		clear
+		dialog --title "Fresh Install" --infobox "Quitting..." 15 50
+		sleep 1
+		clear
+		return $q
+	fi
+	return 0
+}
+
+
+#----------------#
+#----- Main -----#
+#----------------#
+
+
+clear
+dialog --title "Fresh Install" --msgbox "\
+Well, well, well... Looks who's come crawling back. \
+Another fresh install? Despicable, you disgust me!\
+\nMight as well get one with it then...
+\n\nPress <Enter> to continue or <Esc> to quit" 15 50
+
+check_dialog_cancel
+if [ "$?" != "0" ]; then exit $?; fi
+
+
+# Housekeeping #
+
+dialog --title "Housekeeping" --infobox "Updates and upgrades" 15 50
+
+sleep 1
+
+sudo apt -y update
+sudo apt -y upgrade
+
+# Store current directory to reset later
+curdir=$(pwd)
+
+# Navigate to tempoary folder
+cd ~/Downloads
+mkdir -p freshinstall
+cd freshinstall
+
+
+# Required programs #
+
+clear
+dialog --title "Required Programs" --msgbox "The following programs will be installed\n\
+- Git\n\
+- Python3\n\
+- Ruby and Curl\n\
+- Snap\n\
+\nPress <Enter> to continue" 15 50
+
+check_dialog_cancel
+if [ "$?" != "0" ]; then exit $?; fi
+
+clear
+dialog --title "Required Programs" --infobox "Installing programs\nDo not interupt" 15 50
+
+
+sudo apt -y install git python3 python3-setuptools python3-gi python-gobject ruby curl snap
+
+# Optional programs #
+
+clear
+dialog --title "Optional Programs" --checklist "What do ya want?\n\n\
+Use the arrow buttons to change the selected option and press <Space> to toggle the it on or off" 20 50 9 \
+a "Atom" on \
+b "Caffeine" on \
+c "Discord" on \
+d "Gestures (& libinput/xdotool)" on \
+e "Gnome Tweak Tools" on \
+f "Google Chrome" on \
+g "GParted" off \
+h "Jetbrains Toolbox" on \
+i "KeePass2" on \
+j "Notify-OSD" on \
+k "qBittorrent" off \
+l "Spotify" on \
+m "Unity Tool Tweak" off \
+n "VLC" on \
+o "VS Code" on \
+2>/tmp/freshinstall_programs
+
+check_dialog_cancel
+if [ "$?" != "0" ]; then exit $?; fi
+
+
+clear
+dialog --title "Optional Programs" --infobox "Installing programs\nDo not interupt" 15 50
+
+sleep 1
+
+restart=false
+while read -n 1 c; do
+	
+	# Atom
+	if [ "$c" == "a" ]; then
+		wget -O atom-amd64.deb https://atom.io/download/deb
+		sudo apt -y install gdebi-core
+		sudo gdebi atom-amd64.deb
+		
+	# Caffeine
+	elif [ "$c" == "b" ]; then
+		sudo apt -y install caffeine
+	
+	# Discord
+	elif [ "$c" == "c" ]; then
+		yes | sudo snap install discord	
+	
+	# Gestures
+	elif [ "$c" == "d" ]; then
+		sudo gpasswd -a $USER input
+		echo "restart = true"
+		restart=true
+		sudo apt -y install wmctrl xdotool libinput-tools
+		git clone https://github.com/bulletmark/libinput-gestures.git
+		cd libinput-gestures
+		sudo ./libinput-gestures-setup install
+		cd ..
+		libinput-gestures-setup autostart
+	
+	# Gnome tweaks
+	elif [ "$c" == "e" ]; then
+		sudo apt -y install gnome-tweak-tool
+	
+	# Chrome
+	elif [ "$c" == "f" ]; then
+		wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+		sudo dpkg -i google-chrome-stable_current_amd64.deb
+		
+	# Gparted
+	elif [ "$c" == "g" ]; then
+		sudo apt -y install gparted
+	
+	# Jetbrains toolbox
+	elif [ "$c" == "h" ]; then
+		wget -O jetbrains-toolbox.tar.gz https://download.jetbrains.com/toolbox/jetbrains-toolbox-1.12.4481.tar.gz
+		tar -xvzf jetbrains-toolbox.tar.gz
+		cd jetbrains-toolbox*/
+		./jetbrains-toolbox
+		cd ..
+	
+	# Keepass2
+	elif [ "$c" == "i" ]; then
+		sudo add-apt-repository ppa:jtaylor/keepass
+		sudo apt -y update
+		sudo apt -y install keepass2
+		
+	# Notify osd
+	elif [ "$c" == "j" ]; then
+		sudo apt -y install notify-osd
+	
+	# qBittorrent
+	elif [ "$c" == "k" ]; then
+		sudo add-apt -y-repository ppa:qbittorrent-team/qbittorrent-stable
+		sudo apt -y update
+		sudo apt -y install qbittorrent
+	
+	# Spotify
+	elif [ "$c" == "l" ]; then
+		yes | sudo snap install spotify
+	
+	# Unity tool tweaks
+	elif [ "$c" == "m" ]; then
+		sudo apt -y install unity-tweak-tool
+	
+	# Vlc
+	elif [ "$c" == "n" ]; then
+		echo "Installing vlc. This may take a while"
+		yes | sudo snap install vlc
+	
+	# Vs code
+	elif [ "$c" == "o" ]; then
+		curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
+		sudo install -o root -g root -m 644 microsoft.gpg /etc/apt/trusted.gpg.d/
+		sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list'
+		sudo apt -y install apt-transport-https
+		sudo apt -y update
+		sudo apt -y install code
+		
+	fi
+	
+done < /tmp/freshinstall_programs
+
+
+# Themes #
+
+clear
+dialog --title "Themes" --checklist "You're so vain\n\n\
+Use the arrow buttons to change the selected option and press <Space> to toggle the it on or off" 20 50 3 \
+a "Numix GTK Theme" on \
+b "Numix Icon Pack" on \
+c "Yosemite San Francisco Font" on \
+2>/tmp/freshinstall_themes
+
+
+check_dialog_cancel
+if [ "$?" != "0" ]; then exit $?; fi
+
+clear
+dialog --title "Optional Programs" --infobox "Installing programs\nDo not interupt" 15 50
+
+sleep 1
+
+#cat /tmp/freshinstall_themes | while read -n 1 c; do
+while read -n 1 c; do
+
+	# Numix theme
+	if [ "$c" == "a" ]; then
+		sudo apt -y install numix-gtk-theme
+	
+	# Numix icons
+	elif [ "$c" == "b" ]; then
+		sudo apt -y install numix-icon-theme
+	
+	# SFNS font
+	elif [ "$c" == "c" ]; then
+		git clone https://github.com/supermarin/YosemiteSanFranciscoFont.git
+		cd YosemiteSanFranciscoFont
+		mkdir -p ~/.fonts
+		cp *.ttf ~/.fonts
+		fc-cache -f
+		
+	fi
+
+done < /tmp/freshinstall_themes
+
+
+# Complete #
+
+dialog --title "Finished" --msgbox "The install is complete! Congrats, you let an innocent computer do your work for you. I hope you're happy...\n\nPress <Enter> to exit" 15 50
+
+check_dialog_cancel
+if [ "$?" != "0" ]; then exit $?; fi
+
+if [ $restart == true ]; then
+
+	dialog --title "Restart" --yesno "The system requires a reboot.\n\nReboot now?" 15 50
+	
+fi
+
+cd $curdir
+clear
