@@ -232,7 +232,9 @@ while read -n 1 c; do
 		
 	# Numix icons
 	elif [ "$c" == "c" ]; then
-		sudo apt -y install numix-icon-theme
+		sudo add-apt-repository ppa:numix/ppa
+		sudo apt -y update
+		sudo apt -y install numix-icon-theme*
 	
 	# SFNS font
 	elif [ "$c" == "d" ]; then
