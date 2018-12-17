@@ -20,6 +20,8 @@ check_dialog_cancel() {
 
 
 clear
+sudo apt -y install dialog
+
 dialog --title "Fresh Install" --msgbox "\
 Well, well, well... Looks who's come crawling back. \
 Another fresh install? Despicable, you disgust me!\
