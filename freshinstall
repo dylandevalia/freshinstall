@@ -130,6 +130,11 @@ while read -n 1 c; do
 		sudo ./libinput-gestures-setup install
 		cd ..
 		libinput-gestures-setup autostart
+		
+		git clone https://gitlab.com/cunidev/gestures
+		cd gestures
+		sudo python3 setup.py install
+		cd ..
 	
 	# Gimp	
 	elif [ "$c" == "e" ]; then
