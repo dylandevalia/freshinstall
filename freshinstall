@@ -67,6 +67,7 @@ dialog --title "Required Programs" --infobox "Installing programs\nDo not interu
 
 sudo apt -y install git python3 python3-setuptools python3-gi python-gobject ruby curl snap
 
+
 # Optional programs #
 
 clear
@@ -76,17 +77,18 @@ a "Atom" on \
 b "Caffeine" on \
 c "Discord" on \
 d "Gestures (& libinput/xdotool)" on \
-e "Gnome Tweak Tools" on \
-f "Google Chrome" on \
-g "GParted" off \
-h "Jetbrains Toolbox" on \
-i "KeePass2" on \
-j "Notify-OSD" on \
-k "qBittorrent" off \
-l "Spotify" on \
-m "Unity Tool Tweak" off \
-n "VLC" on \
-o "VS Code" on \
+e "GIMP" on \
+f "Gnome Tweak Tools" on \
+g "Google Chrome" on \
+h "GParted" off \
+i "Jetbrains Toolbox" on \
+j "KeePass2" on \
+k "Notify-OSD" on \
+l "qBittorrent" off \
+m "Spotify" on \
+n "Unity Tool Tweak" off \
+o "VLC" on \
+p "VS Code" on \
 2>/tmp/freshinstall_programs
 
 check_dialog_cancel
@@ -127,21 +129,25 @@ while read -n 1 c; do
 		cd ..
 		libinput-gestures-setup autostart
 	
-	# Gnome tweaks
+	# Gimp	
 	elif [ "$c" == "e" ]; then
+		sudo apt -y install gimp
+	
+	# Gnome tweaks
+	elif [ "$c" == "f" ]; then
 		sudo apt -y install gnome-tweak-tool
 	
-	# Chrome
-	elif [ "$c" == "f" ]; then
+	# Google chrome
+	elif [ "$c" == "g" ]; then
 		wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 		sudo dpkg -i google-chrome-stable_current_amd64.deb
 		
 	# Gparted
-	elif [ "$c" == "g" ]; then
+	elif [ "$c" == "h" ]; then
 		sudo apt -y install gparted
 	
 	# Jetbrains toolbox
-	elif [ "$c" == "h" ]; then
+	elif [ "$c" == "i" ]; then
 		wget -O jetbrains-toolbox.tar.gz https://download.jetbrains.com/toolbox/jetbrains-toolbox-1.12.4481.tar.gz
 		tar -xvzf jetbrains-toolbox.tar.gz
 		cd jetbrains-toolbox*/
@@ -149,36 +155,36 @@ while read -n 1 c; do
 		cd ..
 	
 	# Keepass2
-	elif [ "$c" == "i" ]; then
+	elif [ "$c" == "j" ]; then
 		sudo add-apt-repository ppa:jtaylor/keepass
 		sudo apt -y update
 		sudo apt -y install keepass2
 		
 	# Notify osd
-	elif [ "$c" == "j" ]; then
+	elif [ "$c" == "k" ]; then
 		sudo apt -y install notify-osd
 	
 	# qBittorrent
-	elif [ "$c" == "k" ]; then
+	elif [ "$c" == "l" ]; then
 		sudo add-apt -y-repository ppa:qbittorrent-team/qbittorrent-stable
 		sudo apt -y update
 		sudo apt -y install qbittorrent
 	
 	# Spotify
-	elif [ "$c" == "l" ]; then
+	elif [ "$c" == "m" ]; then
 		yes | sudo snap install spotify
 	
 	# Unity tool tweaks
-	elif [ "$c" == "m" ]; then
+	elif [ "$c" == "n" ]; then
 		sudo apt -y install unity-tweak-tool
 	
 	# Vlc
-	elif [ "$c" == "n" ]; then
+	elif [ "$c" == "o" ]; then
 		echo "Installing vlc. This may take a while"
 		yes | sudo snap install vlc
 	
 	# Vs code
-	elif [ "$c" == "o" ]; then
+	elif [ "$c" == "p" ]; then
 		curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
 		sudo install -o root -g root -m 644 microsoft.gpg /etc/apt/trusted.gpg.d/
 		sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list'
@@ -195,10 +201,11 @@ done < /tmp/freshinstall_programs
 
 clear
 dialog --title "Themes" --checklist "You're so vain\n\n\
-Use the arrow buttons to change the selected option and press <Space> to toggle the it on or off" 20 50 3 \
-a "Numix GTK Theme" on \
-b "Numix Icon Pack" on \
-c "Yosemite San Francisco Font" on \
+Use the arrow buttons to change the selected option and press <Space> to toggle the it on or off" 20 50 4 \
+a "Arc Theme" on \
+b "Numix GTK Theme" on \
+c "Numix Icon Pack" on \
+d "Yosemite San Francisco Font" on \
 2>/tmp/freshinstall_themes
 
 
@@ -213,16 +220,20 @@ sleep 1
 #cat /tmp/freshinstall_themes | while read -n 1 c; do
 while read -n 1 c; do
 
-	# Numix theme
+	# Arc theme
 	if [ "$c" == "a" ]; then
-		sudo apt -y install numix-gtk-theme
+		sudo apt -y install arc-theme
 	
-	# Numix icons
+	# Numix theme
 	elif [ "$c" == "b" ]; then
+		sudo apt -y install numix-gtk-theme
+		
+	# Numix icons
+	elif [ "$c" == "c" ]; then
 		sudo apt -y install numix-icon-theme
 	
 	# SFNS font
-	elif [ "$c" == "c" ]; then
+	elif [ "$c" == "d" ]; then
 		git clone https://github.com/supermarin/YosemiteSanFranciscoFont.git
 		cd YosemiteSanFranciscoFont
 		mkdir -p ~/.fonts
