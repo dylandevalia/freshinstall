@@ -46,7 +46,7 @@ curdir=$(pwd)
 
 # Navigate to tempoary folder
 cd ~/Downloads
-mkdir -p freshinstall
+mkdir -p tmp_freshinstall
 cd freshinstall
 
 
